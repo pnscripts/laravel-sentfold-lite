@@ -1,0 +1,27 @@
+{
+    "name": "pnscripts/laravel-sentfold-lite",
+    "description": "Sentfold Lite: a free archive of every e-mail your Laravel app sends, with secrets redacted before storing and a retention prune command.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "mail", "email", "email log", "mail log", "archive", "redaction", "gdpr"],
+    "homepage": "https://pnscripts.com/marketplace/laravel-sentfold",
+    "authors": [{"name": "PN Scripts", "email": "office@pnscripts.com", "homepage": "https://pnscripts.com"}],
+    "support": {"email": "office@pnscripts.com", "issues": "https://github.com/pnscripts/laravel-sentfold-lite/issues", "source": "https://github.com/pnscripts/laravel-sentfold-lite"},
+    "require": {
+        "php": "^8.2",
+        "illuminate/console": "^12.0|^13.0",
+        "illuminate/database": "^12.0|^13.0",
+        "illuminate/mail": "^12.0|^13.0",
+        "illuminate/support": "^12.0|^13.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0|^11.0",
+        "phpunit/phpunit": "^11.5|^12.0"
+    },
+    "autoload": {"psr-4": {"PNScripts\\SentfoldLite\\": "src/", "PNScripts\\SentfoldLite\\Database\\Factories\\": "database/factories/"}},
+    "autoload-dev": {"psr-4": {"PNScripts\\SentfoldLite\\Tests\\": "tests/"}},
+    "extra": {"laravel": {"providers": ["PNScripts\\SentfoldLite\\SentfoldLiteServiceProvider"]}},
+    "config": {"sort-packages": true},
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
