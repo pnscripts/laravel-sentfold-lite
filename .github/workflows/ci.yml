@@ -1,0 +1,56 @@
+name: CI
+
+# Every push to main and every pull request. A library commits no
+# composer.lock, so each run resolves the newest versions the constraints
+# allow: what a new install gets. A Laravel release that breaks this package
+# is caught here, not by the people using it.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly, so a new Laravel release is tried even when nothing here changed.
+    - cron: '0 5 * * 1'
+
+permissions:
+  contents: read
+
+# A newer push to the same branch or pull request replaces a run still in progress.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }}${{ matrix.lowest && ', lowest dependencies' || '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Only include entries, so each one is its own job. The package needs
+        # PHP 8.2 or newer: 8.2 resolves Laravel 12 and PHPUnit 11, 8.4
+        # resolves Laravel 13 and PHPUnit 12.
+        include:
+          - php: '8.2'
+          - php: '8.4'
+          # The oldest releases composer.json allows (Laravel 12.0, Testbench
+          # 10.0, PHPUnit 11.5), so a raised minimum is noticed. Not audited:
+          # nobody installs these on purpose, the newest set is what users get.
+          - php: '8.2'
+            lowest: true
+    steps:
+      # Actions are pinned to commit hashes, so a moved tag cannot change what runs here.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo_sqlite
+          coverage: none
+          tools: composer:v2
+      - name: Install dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist ${{ matrix.lowest && '--prefer-lowest' || '' }}
+      - name: Composer audit
+        if: ${{ !matrix.lowest }}
+        run: composer audit
+      - name: Tests
+        run: vendor/bin/phpunit
